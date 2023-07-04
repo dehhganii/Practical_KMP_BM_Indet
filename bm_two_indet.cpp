@@ -692,6 +692,7 @@ vector<int> read_file(string filename) {
     }
     
     int sigma = atoi(argv[1]);
+    init_indet(sigma);
     vector<int> twos = gen_twos(sigma);
     fill_check_indet(twos);
     string text_file_name = argv[2];
