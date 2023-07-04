@@ -14,16 +14,45 @@
 
 using namespace std;
 
-
+/**
+ * @brief Return minimum of two numbers
+ * 
+ */
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+/**
+ * @brief Return maximum of two numbers
+ * 
+ */ 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+/**
+ * @brief Determine if number is indeterminate or not
+ * 
+ */
 #define INDET(n) ((n) >= 30 || !check_indet[(n)])
 
+/**
+ * @brief Computes the greatest common divisor of two numbers
+ * 
+ * @param a First number
+ * @param b Second number
+ * @return int The gcd of the two numbers
+ */
 int gcd(int a, int b) {
   if (a == 0) return b;
   return gcd(b % a, a);
 }
-
+/**
+ * @brief Copies elements from one array(len) to another based on certain condition involving pos,myequal,and x
+ * 
+ * @param J Index value used in loop 
+ * @param lim Limit value to determine if loop should keep iterating
+ * @param pos Pointer to an array that holds integer values. Used in comparisons and computations within the loop
+ * @param len Pointer to an arrary used to modify elements of the array based on certain conditions
+ * @param x Pointer to an array used to access elements for computation within the loop
+ * @param m Integer value
+ * @param myequal Pointer to integer array used to determine a condition within the loop
+ * @param n Integere value
+ */
 void copy(int J, int lim, int *pos, int *len, int *x, int m, int *myequal, int n) {
   int Jprime, I;
   int pos1, pos2;
@@ -48,7 +77,16 @@ void copy(int J, int lim, int *pos, int *len, int *x, int m, int *myequal, int n
   }
 }
 
-
+/**
+ * @brief Compare elements at pos1 and pos2 and update myequal array accordingly
+ * 
+ * @param pos1 Index value in x array
+ * @param pos2 Another index value in x array
+ * @param j Index value in myequal array
+ * @param x Pointer to x array
+ * @param myequal Pointer to myequal array
+ * @return pos1 Final value of pos1
+ */
 int mymatch(int pos1, int pos2, int j, int *x, int *myequal) {
   while (pos2 >= 0 && gcd(x[pos1], x[pos2]) != 1) {
     if (x[pos1] != x[pos2]) {
@@ -60,7 +98,17 @@ int mymatch(int pos1, int pos2, int j, int *x, int *myequal) {
   return(pos1);
 }
 
-
+/**
+ * @brief Computes the length of a pattern in a given sequence and updating relevent arrays
+ * 
+ * @param x Pointer to x array
+ * @param len_p Length of pattern
+ * @param matched_t Length of matched substring
+ * @param pos Pointer to array that stores positions within x array, based on certain conditions
+ * @param len Pointer to array that stores lengths
+ * @param myequal Pointer to myequal array
+ * @return Length of the pattern or the difference between len_p and position in the pos array
+ */
 int poslen(int *x, int len_p, int matched_t, int *pos, int *len, int *myequal) {
   int lambda, n, j, lim, suff;
   int i, end;
@@ -102,9 +150,25 @@ int poslen(int *x, int len_p, int matched_t, int *pos, int *len, int *myequal) {
   return(len_p);
 }
 
-
+/**
+ * @brief Initilizes variables used for measuring execution time
+ * 
+ */
 clock_t start_BM, finish_BM;
+
+/**
+ * @brief Global vector declared with a size of 30 elements and each element is initialized to a value of -1
+ * 
+ */
 vector<int> check_indet(30, 0);
+
+/**
+ * @brief Checks if number is prime 
+ * 
+ * @param n Number that is being checked
+ * @return true If n is prime 
+ * @return false If n is not prime
+ */
 bool isPrime(int n)
 {
     if (n <= 1)
@@ -122,6 +186,12 @@ bool isPrime(int n)
     return true;
 }
 
+/**
+ * @brief Generates an n number of prime numbers and stores them in the vector prime
+ * 
+ * @param n Number of prime numbers generated
+ * @return vector<int> primes Vector with all generated prime numbers
+ */
 vector<int> gen_prime(int n)
 {
     vector<int> primes;
@@ -139,6 +209,11 @@ vector<int> gen_prime(int n)
     return primes;
 }
 
+/**
+ * @brief Fills check_indet vector with a value of 1 corresponding to the indices of the values found in primes
+ * 
+ * @param primes Vector with prime number values 
+ */
 void fill_check_indet(const vector<int> &primes)
 {
     for(int i=0; i < primes.size(); i++)
@@ -149,7 +224,13 @@ void fill_check_indet(const vector<int> &primes)
 }
 
 
-
+/**
+ * @brief Creates custom mapping between prime numbers and their corresponding indices
+ * 
+ * @param sigma Size of alphabet
+ * @param prime Vector madeup of prime integers
+ * @return amap Cutsom mapping of prime numbers to respective indices
+ */
 vector<int> costum_map(int sigma, const vector<int> &prime)
 {
     vector<int> amap(prime[sigma - 1] + 1, -1); 
@@ -160,6 +241,14 @@ vector<int> costum_map(int sigma, const vector<int> &prime)
     return amap;
 }
 
+/**
+ * @brief Finds the prime factors(roots) of a number
+ * 
+ * @param n Integer
+ * @param sigma Size of alphabet
+ * @param prime Vector madeup of prime integers
+ * @return root_vector All prime factors of n 
+ */
 vector<int> roots(int n, int sigma, const vector<int> &prime)
 {
     vector<int> root_vector;
@@ -173,7 +262,13 @@ vector<int> roots(int n, int sigma, const vector<int> &prime)
     return root_vector;
 }
 
-
+/**
+ * @brief  Z-array of a sequence
+ * 
+ * @param s Sequence
+ * @param len Length of the sequence
+ * @return z Z-array  
+ */
 vector<int> z_array(const vector<int> &s, int len)
 {
     assert(len > 1);
@@ -247,6 +342,13 @@ vector<int> z_array(const vector<int> &s, int len)
     return z;
 }
 
+/**
+ * @brief Calculates n-array of a given sequence
+ * 
+ * @param s Input sequence
+ * @param len Length of s
+ * @return z_tmp_rev N-array 
+ */
 vector<int> n_array(const vector<int> &s, int len)
 {
     vector<int> tmp_s(len);
@@ -263,6 +365,13 @@ vector<int> n_array(const vector<int> &s, int len)
     return z_tmp_rev;
 }
 
+/**
+ * @brief Calculates big l prime array for a given sequence
+ * 
+ * @param p Input sequence
+ * @param len Length of p 
+ * @return big_l_prime_array_s Big L prime array of p 
+ */
 vector<int> big_l_prime_array(const vector<int> &p, int len)
 {
     vector<int> big_l_prime_array_s(len);
@@ -279,6 +388,14 @@ vector<int> big_l_prime_array(const vector<int> &p, int len)
     return big_l_prime_array_s;
 }
 
+/**
+ * @brief Calculated big l array for a given sequence
+ * 
+ * @param pattern Pattern sequence
+ * @param big_l_prime Big l prime array of the pattern sequence
+ * @param len Length of pattern sequence
+ * @return big_l_array_s Big l array
+ */
 vector<int> big_l_array(const vector<int> &pattern, const vector<int> &big_l_prime, int len)
 {
     vector<int> big_l_array_s(len);
@@ -289,7 +406,13 @@ vector<int> big_l_array(const vector<int> &pattern, const vector<int> &big_l_pri
     }
     return big_l_array_s;
 }
-
+/**
+ * @brief Calculates small l prime array for a given pattern sequence
+ * 
+ * @param n N-array
+ * @param len Length of pattern sequence
+ * @return small_l_prime_array_s Small l prime array 
+ */
 vector<int> small_l_prime_array(vector<int> n, int len)
 {
     vector<int> small_l_prime_array_s(len);
@@ -311,7 +434,16 @@ vector<int> small_l_prime_array(vector<int> n, int len)
 }
 
 
-
+/**
+ * @brief Create a dense bad character table object based on the given sequence
+ * 
+ * @param pattern Pattern sequence
+ * @param pat_len Length of pattern sequence 
+ * @param sigma Size of alphabet
+ * @param amap Mapping of characters from corresponding indices
+ * @param primes Vector of prime integers
+ * @return tab Dense bad character shift table 
+ */
 vector<vector<int> > create_dense_bad_char_table(const vector<int> &pattern, int pat_len, int sigma, const vector<int> &amap, const vector<int> &primes) {
     vector<vector<int> > tab;
     vector<int> nxt(sigma, 0);
@@ -331,7 +463,17 @@ vector<vector<int> > create_dense_bad_char_table(const vector<int> &pattern, int
     return tab;
 }
 
-
+/**
+ * @brief Calculates shift distance for given index and character
+ * 
+ * @param i Current index
+ * @param c Character 
+ * @param bad_char_table Bad character shift table
+ * @param amap Custom mapping of characters to respective indices
+ * @param sigma Size of alphabet
+ * @param primes Vector of prime numbers
+ * @return Shift distance
+ */
 int dense_bad_char_shift(int i, int c, const vector<vector<int> > &bad_char_table, const vector<int> &amap, int sigma, vector<int> primes) {
     if(!INDET(c)) {
         return i - (bad_char_table[i][amap[c]]-1);
@@ -349,7 +491,15 @@ int dense_bad_char_shift(int i, int c, const vector<vector<int> > &bad_char_tabl
     }
 }
 
-
+/**
+ * @brief Calculates shift distance based on current index and values in big l array and small prime array
+ * 
+ * @param i Current index
+ * @param big_l_array_s Big l array 
+ * @param small_l_prime_array_s Small l prime array
+ * @param len_big_l_array Length of big l array
+ * @return Shift distance
+ */
 int good_suffix_rule_fun(int i,const vector<int> &big_l_array_s, const vector<int> &small_l_prime_array_s, int len_big_l_array){
     if(i >= len_big_l_array){
         return -1;
@@ -365,7 +515,20 @@ int good_suffix_rule_fun(int i,const vector<int> &big_l_array_s, const vector<in
 
 }
 
-
+/**
+ * @brief Handles mismatches ocurring during string matching
+ * 
+ * @param pattern Pattern sequence
+ * @param len_p Length of pattern
+ * @param text Text sequence
+ * @param i Current index
+ * @param j Current index within pattern
+ * @param stringForSuff Pointer to modified pattern sequence array
+ * @param pos Pointer to array storing position information
+ * @param len Pointer to array stroing length of substring
+ * @param myequal Pointer to integer storing a flag 
+ * @return poslen Length of the pattern or the difference between len_p and position in the pos array
+ */
 int indet_good_suffix(const vector<int> &pattern, int len_p, const vector<int> &text, int i, int j,
    int *stringForSuff, int *pos, int *len, int *myequal) {   
     int matched_t = 0;
@@ -392,7 +555,17 @@ int indet_good_suffix(const vector<int> &pattern, int len_p, const vector<int> &
 }
 
 
-
+/**
+ * @brief Implements BM algorithm on indeterminate strings
+ * 
+ * @param t Text sequence
+ * @param p Pattern sequence
+ * @param len_t Length of text
+ * @param len_p Length of pattern
+ * @param sigma Size of alphabet
+ * @param primes Vector of prime numbers
+ * @return occurrences_len Number of pattern occurrences found in the text 
+ */
 int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int len_p, int sigma, const vector<int> &primes)
 {
     vector<int> n = n_array(p, len_p);
@@ -504,6 +677,13 @@ int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int 
     return occurrences_len;
 }
 
+
+/**
+ * @brief Reads file and extracts necessary text 
+ * 
+ * @param filename The filename for the text being searched 
+ * @return result Vector of the integers read from the file 
+ */
 vector<int> read_file(string filename) {
     vector<int> result;
     ifstream file(filename);
