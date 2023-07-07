@@ -11,6 +11,7 @@
 #include <sstream>
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 
 using namespace std;
 
@@ -28,18 +29,11 @@ using namespace std;
  * @brief Determine if number is indeterminate or not
  * 
  */
-#define INDET(n) ((n) >= 30 || !check_indet[(n)])
+#define INDET(n) (!check_indet[(n)])
 
-/**
- * @brief Computes the greatest common divisor of two numbers
- * 
- * @param a First number
- * @param b Second number
- * @return int The gcd of the two numbers
- */
-int gcd(int a, int b) {
-  if (a == 0) return b;
-  return gcd(b % a, a);
+
+int bit_AND(int a, int b) {
+    return a & b;
 }
 /**
  * @brief Copies elements from one array(len) to another based on certain condition involving pos,myequal,and x
@@ -66,7 +60,7 @@ void copy(int J, int lim, int *pos, int *len, int *x, int m, int *myequal, int n
     else {
       pos1 = m-2;
       pos2 = I-1;
-      while (pos2 >= 0 && gcd(x[pos1], x[pos2]) != 1) {
+      while (pos2 >= 0 && bit_AND(x[pos1], x[pos2]) != 0) {
         --pos1;
         --pos2;
       }
@@ -88,7 +82,7 @@ void copy(int J, int lim, int *pos, int *len, int *x, int m, int *myequal, int n
  * @return pos1 Final value of pos1
  */
 int mymatch(int pos1, int pos2, int j, int *x, int *myequal) {
-  while (pos2 >= 0 && gcd(x[pos1], x[pos2]) != 1) {
+  while (pos2 >= 0 && bit_AND(x[pos1], x[pos2]) != 0) {
     if (x[pos1] != x[pos2]) {
       myequal[j] = 0;
     }
@@ -117,7 +111,7 @@ int poslen(int *x, int len_p, int matched_t, int *pos, int *len, int *myequal) {
   lambda = x[m-1];
   n = 0;
   for (i = len_p-2; i >= 0; --i) {
-    if (gcd(x[i], lambda) != 1) {
+    if (bit_AND(x[i], lambda) != 0) {
       pos[n] = i;
       len[n] = 1;
       myequal[n] = x[i] == lambda;
@@ -160,30 +154,26 @@ clock_t start_BM, finish_BM;
  * @brief Global vector declared with a size of 30 elements and each element is initialized to a value of -1
  * 
  */
-vector<int> check_indet(30, 0);
+vector<int> check_indet;
+
+void init_indet(int sigma){
+    int max = pow(2,sigma);
+    check_indet.resize(max, 0);
+}
 
 /**
- * @brief Checks if number is prime 
+ * @brief Checks if number is power
  * 
  * @param n Number that is being checked
  * @return true If n is prime 
  * @return false If n is not prime
  */
-bool isPrime(int n)
-{
-    if (n <= 1)
-    {
+bool isPowerOfTwo(int n) {
+    if (n == 0)
         return false;
-    }
-        for (int i = 2; i <= n / 2; i++)
-    {
-        if (n % i == 0)
-        {
-            return false;
-        }
-    }
-
-    return true;
+    while (n % 2 == 0)
+        n /= 2;
+    return n == 1;
 }
 
 /**
@@ -192,21 +182,16 @@ bool isPrime(int n)
  * @param n Number of prime numbers generated
  * @return vector<int> primes Vector with all generated prime numbers
  */
-vector<int> gen_prime(int n)
-{
-    vector<int> primes;
-    int i = 2;
-
-    while (primes.size() < n)
-    {
-        if (isPrime(i))
-        {
-            primes.push_back(i);
+vector<int> gen_twos(int n) {
+    vector<int> twos;
+    int i = 1;
+    while (twos.size() < n) {
+        if (isPowerOfTwo(i)) {
+            twos.push_back(i);
         }
         i++;
     }
-
-    return primes;
+    return twos;
 }
 
 /**
@@ -214,13 +199,10 @@ vector<int> gen_prime(int n)
  * 
  * @param primes Vector with prime number values 
  */
-void fill_check_indet(const vector<int> &primes)
-{
-    for(int i=0; i < primes.size(); i++)
-    {
-        check_indet[primes[i]] = 1;
+void fill_check_indet(const vector<int>& twos) {
+    for (int i = 0; i < twos.size(); i++) {
+        check_indet[twos[i]] = 1;
     }
-
 }
 
 
@@ -231,12 +213,12 @@ void fill_check_indet(const vector<int> &primes)
  * @param prime Vector madeup of prime integers
  * @return amap Cutsom mapping of prime numbers to respective indices
  */
-vector<int> costum_map(int sigma, const vector<int> &prime)
+vector<int> costum_map(int sigma, const vector<int> &two)
 {
-    vector<int> amap(prime[sigma - 1] + 1, -1); 
+    vector<int> amap(two[sigma - 1] + 1, -1); 
     for (int i = 0; i < sigma; i++)
     {
-        amap[prime[i]] = i;
+        amap[two[i]] = i;
     }
     return amap;
 }
@@ -249,14 +231,14 @@ vector<int> costum_map(int sigma, const vector<int> &prime)
  * @param prime Vector madeup of prime integers
  * @return root_vector All prime factors of n 
  */
-vector<int> roots(int n, int sigma, const vector<int> &prime)
+vector<int> roots(int n, int sigma, const vector<int> &two)
 {
     vector<int> root_vector;
     for (int i = 0; i < sigma; i++)
     {
-        if (n % prime[i] == 0)
+        if (n % two[i] == 0)
         {
-            root_vector.push_back(prime[i]);
+            root_vector.push_back(two[i]);
         }
     }
     return root_vector;
@@ -276,7 +258,7 @@ vector<int> z_array(const vector<int> &s, int len)
     z[0] = len;
     for (int i = 1; i < len; i++)
     {
-        if (gcd(s[i], s[i - 1]) > 1)
+        if (bit_AND(s[i], s[i - 1]) > 0)
         {
             z[1] += 1;
         }
@@ -299,7 +281,7 @@ vector<int> z_array(const vector<int> &s, int len)
         {
             for (int j = k; j < len; j++)
             {
-                if (gcd(s[j], s[j - k]) > 1)
+                if (bit_AND(s[j], s[j - k]) > 0)
                 {
                     z[k] += 1;
                 }
@@ -324,7 +306,7 @@ vector<int> z_array(const vector<int> &s, int len)
                 int nmatch = 0;
                 for (int i = r + 1; i < len; i++)
                 {
-                    if (gcd(s[i], s[i - k]) > 1)
+                    if (bit_AND(s[i], s[i - k]) > 0)
                     {
                         nmatch += 1;
                     }
@@ -372,9 +354,9 @@ vector<int> n_array(const vector<int> &s, int len)
  * @param len Length of p 
  * @return big_l_prime_array_s Big L prime array of p 
  */
-vector<int> big_l_prime_array(const vector<int> &p, int len)
+vector<int> big_l_two_array(const vector<int> &p, int len)
 {
-    vector<int> big_l_prime_array_s(len);
+    vector<int> big_l_two_array_s(len);
     vector<int> n = n_array(p, len);
     int i = 0;
     for (int j = 0; j < len - 1; j++)
@@ -382,10 +364,10 @@ vector<int> big_l_prime_array(const vector<int> &p, int len)
         i = len - n[j];
         if (i < len)
         {
-            big_l_prime_array_s[i] = j + 1;
+            big_l_two_array_s[i] = j + 1;
         }
     }
-    return big_l_prime_array_s;
+    return big_l_two_array_s;
 }
 
 /**
@@ -396,13 +378,13 @@ vector<int> big_l_prime_array(const vector<int> &p, int len)
  * @param len Length of pattern sequence
  * @return big_l_array_s Big l array
  */
-vector<int> big_l_array(const vector<int> &pattern, const vector<int> &big_l_prime, int len)
+vector<int> big_l_array(const vector<int> &pattern, const vector<int> &big_l_two, int len)
 {
     vector<int> big_l_array_s(len);
-    big_l_array_s[1] = big_l_prime[1];
+    big_l_array_s[1] = big_l_two[1];
     for (int j = 2; j < len; j++)
     {
-        big_l_array_s[j] = MAX(big_l_array_s[j - 1], big_l_prime[j]);
+        big_l_array_s[j] = MAX(big_l_array_s[j - 1], big_l_two[j]);
     }
     return big_l_array_s;
 }
@@ -413,24 +395,24 @@ vector<int> big_l_array(const vector<int> &pattern, const vector<int> &big_l_pri
  * @param len Length of pattern sequence
  * @return small_l_prime_array_s Small l prime array 
  */
-vector<int> small_l_prime_array(vector<int> n, int len)
+vector<int> small_l_two_array(vector<int> n, int len)
 {
-    vector<int> small_l_prime_array_s(len);
+    vector<int> small_l_two_array_s(len);
     for (int j = 0; j < len; j++)
     {
         if (n[j] == j + 1)
         {
-            small_l_prime_array_s[len - j - 1] = j + 1;
+            small_l_two_array_s[len - j - 1] = j + 1;
         }
     }
     for (int j = len - 2; j > -1; j--)
     {
-        if (small_l_prime_array_s[j] == 0)
+        if (small_l_two_array_s[j] == 0)
         {
-            small_l_prime_array_s[j] = small_l_prime_array_s[j + 1];
+            small_l_two_array_s[j] = small_l_two_array_s[j + 1];
         }
     }
-    return small_l_prime_array_s;
+    return small_l_two_array_s;
 }
 
 
@@ -444,13 +426,13 @@ vector<int> small_l_prime_array(vector<int> n, int len)
  * @param primes Vector of prime integers
  * @return tab Dense bad character shift table 
  */
-vector<vector<int> > create_dense_bad_char_table(const vector<int> &pattern, int pat_len, int sigma, const vector<int> &amap, const vector<int> &primes) {
+vector<vector<int> > create_dense_bad_char_table(const vector<int> &pattern, int pat_len, int sigma, const vector<int> &amap, const vector<int> &twos) {
     vector<vector<int> > tab;
     vector<int> nxt(sigma, 0);
     for(int i=0; i < pat_len; i++) {
         int c = pattern[i];
         if(INDET(c)) {
-            vector<int> root_vector = roots(c, sigma,primes);
+            vector<int> root_vector = roots(c, sigma,twos);
             for(int j=0; j < root_vector.size(); j++) {
                 nxt[amap[root_vector[j]]] = i + 1;
             }
@@ -474,13 +456,13 @@ vector<vector<int> > create_dense_bad_char_table(const vector<int> &pattern, int
  * @param primes Vector of prime numbers
  * @return Shift distance
  */
-int dense_bad_char_shift(int i, int c, const vector<vector<int> > &bad_char_table, const vector<int> &amap, int sigma, vector<int> primes) {
+int dense_bad_char_shift(int i, int c, const vector<vector<int> > &bad_char_table, const vector<int> &amap, int sigma, vector<int> twos) {
     if(!INDET(c)) {
         return i - (bad_char_table[i][amap[c]]-1);
     }
     else {
         
-        vector<int> c_roots = roots(c, sigma, primes);
+        vector<int> c_roots = roots(c, sigma, twos);
         int shift = 0;
         int bound = c_roots.size();
         for(int k = 0; k < bound; k++) {
@@ -500,7 +482,7 @@ int dense_bad_char_shift(int i, int c, const vector<vector<int> > &bad_char_tabl
  * @param len_big_l_array Length of big l array
  * @return Shift distance
  */
-int good_suffix_rule_fun(int i,const vector<int> &big_l_array_s, const vector<int> &small_l_prime_array_s, int len_big_l_array){
+int good_suffix_rule_fun(int i,const vector<int> &big_l_array_s, const vector<int> &small_l_two_array_s, int len_big_l_array){
     if(i >= len_big_l_array){
         return -1;
     }
@@ -511,7 +493,7 @@ int good_suffix_rule_fun(int i,const vector<int> &big_l_array_s, const vector<in
     if(big_l_array_s[j] > 0){
         return len_big_l_array - big_l_array_s[j];
     }
-    return len_big_l_array - small_l_prime_array_s[j];
+    return len_big_l_array - small_l_two_array_s[j];
 
 }
 
@@ -566,14 +548,14 @@ int indet_good_suffix(const vector<int> &pattern, int len_p, const vector<int> &
  * @param primes Vector of prime numbers
  * @return occurrences_len Number of pattern occurrences found in the text 
  */
-int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int len_p, int sigma, const vector<int> &primes)
+int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int len_p, int sigma, const vector<int> &twos)
 {
     vector<int> n = n_array(p, len_p);
-    vector<int> big_l_prime = big_l_prime_array(p, len_p);
-    vector<int> big_l = big_l_array(p, big_l_prime, len_p);
-    vector<int> small_l_prime = small_l_prime_array(n, len_p);
-    vector<int> amap = costum_map(sigma, primes);
-    vector<vector<int> > bad_char_table = create_dense_bad_char_table(p, len_p, sigma, amap, primes);
+    vector<int> big_l_two = big_l_two_array(p, len_p);
+    vector<int> big_l = big_l_array(p, big_l_two, len_p);
+    vector<int> small_l_two = small_l_two_array(n, len_p);
+    vector<int> amap = costum_map(sigma, twos);
+    vector<vector<int> > bad_char_table = create_dense_bad_char_table(p, len_p, sigma, amap, twos);
     int *stringForSuff;
     int *pos;
     int *len;
@@ -620,7 +602,7 @@ int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int 
     i = 0;
     int bound = len_t - len_p + 1;
     int len_pMinus1 = len_p-1;
-    int period = len_p - small_l_prime[1];
+    int period = len_p - small_l_two[1];
     while (i < bound)
     {
         shift = 1;
@@ -632,9 +614,9 @@ int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int 
             {
                 right_most_indet = i+j;
             }
-            if (gcd(p[j], t[i + j]) == 1)
+            if (bit_AND(p[j], t[i + j]) == 0)
             {
-                int bc_shift = dense_bad_char_shift(j, t[i + j], bad_char_table, amap, sigma, primes);
+                int bc_shift = dense_bad_char_shift(j, t[i + j], bad_char_table, amap, sigma, twos);
 
                 if ((i + j >= right_most_indet && right_most_indet <= i +len_pMinus1) || len_pMinus1 - j >= m_ell_suf)
                 {
@@ -642,7 +624,7 @@ int boyer_more_indet(const vector<int> &t, const vector<int> &p, int len_t, int 
                 }
                 else
                 {
-                    gs_shift = good_suffix_rule_fun(j, big_l, small_l_prime, len_p);
+                    gs_shift = good_suffix_rule_fun(j, big_l, small_l_two, len_p);
 
                 }
                 shift = MAX(shift, bc_shift);
@@ -710,8 +692,9 @@ vector<int> read_file(string filename) {
     }
     
     int sigma = atoi(argv[1]);
-    vector<int> primes = gen_prime(sigma);
-    fill_check_indet(primes);
+    init_indet(sigma);
+    vector<int> twos = gen_twos(sigma);
+    fill_check_indet(twos);
     string text_file_name = argv[2];
     vector<int> test_text = read_file(text_file_name);
     string pattern_file_name = argv[3];
@@ -720,8 +703,8 @@ vector<int> read_file(string filename) {
     long int text_length = test_text.size();
     long int pattern_length = test_pattern.size();
     start_BM = clock();
-    vector<int> amap = costum_map(sigma, primes);
-    int answers = boyer_more_indet(test_text, test_pattern, text_length, pattern_length, sigma, primes);
+    vector<int> amap = costum_map(sigma, twos);
+    int answers = boyer_more_indet(test_text, test_pattern, text_length, pattern_length, sigma, twos);
     //vector<vector<int>> tab = create_dense_bad_char_table(test_pattern, pattern_length, sigma, amap, primes);
     //dense_bad_char_shift(3, 21, tab, amap, sigma, primes);
     finish_BM = clock();
@@ -729,6 +712,6 @@ vector<int> read_file(string filename) {
     //cout << "number_of_matches" << answers << endl;
     printf("%.7f", BM_time);
     
-    //cout << "number of occurences" << answers << endl;
+    cout << "number of occurences" << answers << endl;
     return 0;
 }
