@@ -8,18 +8,42 @@
 
 using namespace std;
 
+/**
+ * @brief Initilizes variables used for measuring execution time
+ * 
+ */
+
 clock_t start_KMP, finish_KMP;
 
+/**
+ * @brief Returns maximum between two values 
+ * 
+ */
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+/**
+ * @brief Global vector
+ * 
+ */
 vector<int> check_indet;
 
+/**
+ * @brief Initializes an array for indeterministic checks.
+ *  
+ * @param sigma The input parameter used to determine the size of the array.
+ */
 void init_indet(int sigma){
     int max = pow(2,sigma);
     check_indet.resize(max, -1);
 }
 
-
+/**
+ * @brief Checks if number is power of two 
+ * 
+ * @param n Number that is being checked
+ * @return true If n is power of two
+ * @return false If n is not power of two
+ */
 bool isPowerOfTwo(int n) {
     if (n == 0)
         return false;
@@ -27,6 +51,13 @@ bool isPowerOfTwo(int n) {
         n /= 2;
     return n == 1;
 }
+
+/**
+ * @brief Generates an n number of power of two numbers and stores them in the vector prime
+ * 
+ * @param n Number of power of twonumbers generated
+ * @return vector<int> twos Vector with all generated power of two numbers
+ */
 
 vector<int> gen_twos(int n) {
     vector<int> twos;
@@ -40,6 +71,11 @@ vector<int> gen_twos(int n) {
     return twos;
 }
 
+/**
+ * @brief Fills check_indet vector with a value of 1 corresponding to the indices of the values found in primes
+ * 
+ * @param twos Vector with power of two number values 
+ */
 void fill_check_indet(const vector<int>& twos) {
     for (int i = 0; i < twos.size(); i++) {
         check_indet[twos[i]] = 1;
@@ -50,6 +86,13 @@ int bit_AND(int a, int b) {
     return a & b;
 }
 
+/**
+ * @brief Computes the greatest common divisor of two numbers
+ * 
+ * @param a First number
+ * @param b Second number
+ * @return int The gcd of the two numbers
+ */
 vector<int> border_array(const vector<int>& pat, int n) {
     vector<int> border_array(n);
     border_array[0] = 0;
@@ -66,6 +109,13 @@ vector<int> border_array(const vector<int>& pat, int n) {
     return border_array;
 }
 
+/**
+ * @brief  Z-array of a sequence
+ * 
+ * @param s Sequence
+ * @param len Length of the sequence
+ * @return z Z-array  
+ */
 vector<int> z_array(const vector<int>& s, int len) {
     assert(len > 1);
     vector<int> z(len);
@@ -118,6 +168,16 @@ vector<int> z_array(const vector<int>& s, int len) {
     return z;
 }
 
+/**
+ * @brief Compares elements of a text at two different positions 
+ * 
+ * @param text Given text
+ * @param pos1 First position for comparison in text
+ * @param pos2 Second position for comparison in text 
+ * @param j Position in the pattern being matched 
+ * @param n Length of text
+ * @return pos1 Position in text where gcd failed or when pos1 reached end of text 
+ */
 int match(const vector<int>& text, int pos1, int pos2, int j, int n) {
     while (bit_AND(text[pos1], text[pos2]) > 0 && pos1 < n && pos2 < n) {
         pos1 = pos1 + 1;
@@ -125,6 +185,14 @@ int match(const vector<int>& text, int pos1, int pos2, int j, int n) {
     }
     return pos1;
 }
+
+/**
+ * @brief Prefix array of text
+ * 
+ * @param text Given text
+ * @param n Length of text 
+ * @return prefix Prefix array
+ */
 
 vector<int> prefix_array(vector<int> text, int n) {
     int lambda = text[0];
@@ -150,6 +218,13 @@ vector<int> prefix_array(vector<int> text, int n) {
     return prefix;
 }
 
+/**
+ * @brief Checks if number is indeterminate
+ * 
+ * @param n Number 
+ * @return true n is indeterminate
+ * @return false n is not indeterminate 
+ */
 bool indet(int n,int sigma) {
     int max = pow(2,sigma);
     if (n > max) {
@@ -160,6 +235,19 @@ bool indet(int n,int sigma) {
     }
     return true;
 }
+
+/**
+ * @brief Computes shift during the pattern matching stage
+ * 
+ * @param indettext Boolean indicating whether text contains indeterminate elements
+ * @param text Given Text
+ * @param pattern Pattern Sequence 
+ * @param i Current index in text
+ * @param j Current index in pattern
+ * @param border Border array of pattern
+ * @param m_ell Position of the first indeterminate element in pattern
+ * @return j Va;lue of the shift that will be applied  
+ */
 
 int compute_shift(bool indettext, const vector<int>& text, const vector<int>& pattern, int i, int j, const vector<int>& border, int m_ell) {
     int mx = -1;
@@ -192,6 +280,17 @@ int compute_shift(bool indettext, const vector<int>& text, const vector<int>& pa
     return j;
 }
 
+/**
+ * @brief Implements KMP algorithm on indeterminate strings
+ * 
+ * @param n Length of text
+ * @param m Length of pattern
+ * @param sigma Size of alphabet
+ * @param text Given Text 
+ * @param pattern Pattern Sequence
+ * @return occurences_len Number of pattern occurrences found in the text 
+ */
+
 int KMP_Indet(int n, int m, int sigma, const vector<int>& text, const vector<int>& pattern) {
     vector<int> twos = gen_twos(sigma);
     int i, j;
@@ -212,10 +311,12 @@ int KMP_Indet(int n, int m, int sigma, const vector<int>& text, const vector<int
     if (m_ell <= 1) {
         border = { 0 };
     } else {
-        border = border_array(pattern, m_ell);
+        border = border_array(pattern, m_ell);//Border array of the longest regular prefix of pattern.
     }
     i = -1;
     j = -1;
+    //i and j are the index positions in the text and pattern that match.
+    //As a result the substrings text[i-j..i] and pattern[0..j] match.
     int right_most_indet = -1;
     while (i < n - 1) {
         if (bit_AND(text[i + 1], pattern[j + 1]) > 0) {
@@ -223,9 +324,10 @@ int KMP_Indet(int n, int m, int sigma, const vector<int>& text, const vector<int
                 indettext = true;
                 right_most_indet = i + 1;
             }
-            j = j + 1;
+            j = j + 1; //j is the index positions the pattern such that the prefix of length j+1 has match with a substsring of text.
             i = i + 1;
             if (j == m - 1) {
+                //cout << "the pattern found in this position of text: " <<  i-j << endl;
                 occurrences_len++;
                 j = compute_shift(indettext, text, pattern, i, j, border, m_ell);
                 if (i - j <= right_most_indet) {
@@ -260,6 +362,12 @@ int KMP_Indet(int n, int m, int sigma, const vector<int>& text, const vector<int
     return occurrences_len;
 }
 
+/**
+ * @brief Reads file and extracts necessary text 
+ * 
+ * @param filename The filename for the text being searched 
+ * @return result Vector of the integers read from the file 
+ */
 vector<int> read_file(const string& filename) {
     vector<int> result;
     ifstream file(filename);
