@@ -182,6 +182,7 @@ bool isPowerOfTwo(int n) {
  * @param n Number of prime numbers generated
  * @return vector<int> primes Vector with all generated prime numbers
  */
+/* my_comment: Here you are checking all integers to figure out which of them are power  of two. You do not need to do that, Just use math.pow() method*/
 vector<int> gen_twos(int n) {
     vector<int> twos;
     int i = 1;
