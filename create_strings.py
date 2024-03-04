@@ -18,17 +18,13 @@ def gen_prime(alphabet_size):
                     return list(primes)
 
 
-def gen_power_set(primes):
-    s = list(primes)
-    multiply = []
-    power_set = list(chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
-    for i in range(2 ** len(primes)):
-        if len(power_set[i]) > 1:
-            count = 1
-            for j in range(len(power_set[i])):
-                count *= power_set[i][j]
-            multiply.append(count)
-    return list(multiply)
+def create_indet_letter(alphabet):
+    indet_letter = 1
+    subset_size = random.randint(2, len(alphabet) - 1)
+    subset = random.sample(range(len(alphabet)), subset_size)
+    for i in subset:
+        indet_letter *= alphabet[i]
+    return indet_letter
 
 
 def gen_solid_string(length, alphabet_size):
@@ -41,28 +37,9 @@ def gen_solid_string(length, alphabet_size):
 
 def gen_indet_string(text, alphabet_size, num):
     alphabet = gen_prime(alphabet_size)
-    indet_list = gen_power_set(alphabet)
-    for i in range(0, num):
-        pos = random.randint(0, len(text) - 1)
-        if text[pos] in alphabet:
-            text[pos] = indet_list[random.randint(0, len(indet_list) - 1)]
-        else:
-            pos = random.randint(0, len(text) - 1)
-            text[pos] = indet_list[random.randint(0, len(indet_list) - 1)]
-    return text
-
-
-def gen_indet_pattern(text, alphabet_size, num):
-    alphabet = gen_prime(alphabet_size)
-    indet_list = gen_power_set(alphabet)
-    #text[len(text) - 1] = indet_list[random.randint(0, len(indet_list) - 1)]
-    for i in range(0, num):
-        pos = random.randint(0, len(text) - 2)
-        if text[pos] in alphabet:
-            text[pos] = indet_list[random.randint(0, len(indet_list) - 1)]
-        else:
-            pos = random.randint(0, len(text) - 1)
-            text[pos] = indet_list[random.randint(0, len(indet_list) - 1)]
+    indet_list = random.sample(range(len(text)), num)
+    for i in indet_list:
+        text[i] = create_indet_letter(alphabet)
     return text
 
 
@@ -72,7 +49,7 @@ def generate_text_pattern(
     text = gen_solid_string(text_length, alphabet)
     text = gen_indet_string(text, alphabet, text_indet_letters)
     pattern = gen_solid_string(pattern_length, alphabet)
-    pattern = gen_indet_pattern(pattern, alphabet, pattern_indet_letters)
+    pattern = gen_indet_string(pattern, alphabet, pattern_indet_letters)
     f = open(
         "demofile_pattern", "w"
     )
@@ -99,3 +76,5 @@ val5 = int(args[4])
 
 
 generate_text_pattern(val1, val2, val3, val4, val5)
+
+
