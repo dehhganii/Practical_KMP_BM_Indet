@@ -12,12 +12,35 @@
 
 using namespace std;
 
+/**
+ * @brief Initilizes variables used for measuring execution time
+ * 
+ */
+
 clock_t start_KMP, finish_KMP;
 
 
+/**
+ * @brief Returns maximum between two values 
+ * 
+ */
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+/**
+ * @brief Global vector declared with a size of 30 elements and each element is initialized to a value of -1
+ * 
+ */
+
 vector<int> check_indet(30, -1);
+
+/**
+ * @brief Checks if number is prime 
+ * 
+ * @param n Number that is being checked
+ * @return true If n is prime 
+ * @return false If n is not prime
+ */
+
 bool isPrime(int n)
 {
     if (n <= 1)
@@ -35,6 +58,13 @@ bool isPrime(int n)
     return true;
 }
 
+/**
+ * @brief Generates an n number of prime numbers and stores them in the vector prime
+ * 
+ * @param n Number of prime numbers generated
+ * @return vector<int> primes Vector with all generated prime numbers
+ */
+
 vector<int> gen_prime(int n)
 {
     vector<int> primes;
@@ -51,6 +81,12 @@ vector<int> gen_prime(int n)
     return primes;
 }
 
+/**
+ * @brief Fills check_indet vector with a value of 1 corresponding to the indices of the values found in primes
+ * 
+ * @param primes Vector with prime number values 
+ */
+
 void fill_check_indet(const vector<int> &primes)
 {
     for(int i=0; i < primes.size(); i++)
@@ -59,6 +95,13 @@ void fill_check_indet(const vector<int> &primes)
     }
 
 }
+/**
+ * @brief Computes the border array of a pattern
+ * 
+ * @param pat Given pattern 
+ * @param n Length of pattern 
+ * @return vector<int> border_array 
+ */
 
 vector<int> borderarray(const vector<int>& pat, int n) {
     vector<int> border_array(n);
@@ -76,12 +119,28 @@ vector<int> borderarray(const vector<int>& pat, int n) {
     return border_array;
 }
 
+/**
+ * @brief Computes the greatest common divisor of two numbers
+ * 
+ * @param a First number
+ * @param b Second number
+ * @return int The gcd of the two numbers
+ */
+
 int gcd(int a, int b)
 {
     if (a == 0)
         return b;
     return gcd(b%a, a);
 }
+
+/**
+ * @brief  Z-array of a sequence
+ * 
+ * @param s Sequence
+ * @param len Length of the sequence
+ * @return z Z-array  
+ */
 
 vector<int> z_array(const vector<int> &s, int len)
 {
@@ -157,6 +216,17 @@ vector<int> z_array(const vector<int> &s, int len)
     return z;
 }
 
+/**
+ * @brief Compares elements of a text at two different positions 
+ * 
+ * @param text Given text
+ * @param pos1 First position for comparison in text
+ * @param pos2 Second position for comparison in text 
+ * @param j Position in the pattern being matched 
+ * @param n Length of text
+ * @return pos1 Position in text where gcd failed or when pos1 reached end of text 
+ */
+
 int match(const vector<int> &text, int pos1, int pos2, int j, int n){
     while(gcd(text[pos1], text[pos2])> 1 && pos1 < n && pos2 < n){
         pos1 = pos1 + 1;
@@ -164,6 +234,14 @@ int match(const vector<int> &text, int pos1, int pos2, int j, int n){
     }
     return pos1;
 }
+
+/**
+ * @brief Prefix array of text
+ * 
+ * @param text Given text
+ * @param n Length of text 
+ * @return prefix Prefix array
+ */
 
 vector<int> prefixarray(vector<int> text, int n){
     int lambda = text[0];
@@ -189,6 +267,14 @@ vector<int> prefixarray(vector<int> text, int n){
     return prefix;
 }
 
+/**
+ * @brief Checks if number is indeterminate
+ * 
+ * @param n Number 
+ * @return true n is indeterminate
+ * @return false n is not indeterminate 
+ */
+
 bool indet(int n) {
     if(n > 30)
     {
@@ -201,6 +287,19 @@ bool indet(int n) {
     return true;
 }
 
+
+/**
+ * @brief Computes shift during the pattern matching stage
+ * 
+ * @param indettext Boolean indicating whether text contains indeterminate elements
+ * @param text Given Text
+ * @param pattern Pattern Sequence 
+ * @param i Current index in text
+ * @param j Current index in pattern
+ * @param border Border array of pattern
+ * @param m_ell Position of the first indeterminate element in pattern
+ * @return j Va;lue of the shift that will be applied  
+ */
 
 int compute_shift(bool indettext, const vector<int> &text, const vector<int> &pattern, int i, int j, vector<int> border, int m_ell){
     int mx = -1;
@@ -236,6 +335,17 @@ int compute_shift(bool indettext, const vector<int> &text, const vector<int> &pa
     }
     return j;
 }
+
+/**
+ * @brief Implements KMP algorithm on indeterminate strings
+ * 
+ * @param n Length of text
+ * @param m Length of pattern
+ * @param sigma Size of alphabet
+ * @param text Given Text 
+ * @param pattern Pattern Sequence
+ * @return occurences_len Number of pattern occurrences found in the text 
+ */
 
 int KMP_Indet(int n, int m, int sigma, const vector<int> &text, const vector<int> &pattern){
 
@@ -329,6 +439,13 @@ int KMP_Indet(int n, int m, int sigma, const vector<int> &text, const vector<int
     }
     return occurences_len;
 }
+
+/**
+ * @brief Reads file and extracts necessary text 
+ * 
+ * @param filename The filename for the text being searched 
+ * @return result Vector of the integers read from the file 
+ */
 
 vector<int> read_file(string filename) {
     vector<int> result;
