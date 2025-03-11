@@ -185,12 +185,9 @@ bool isPowerOfTwo(int n) {
 /* my_comment: Here you are checking all integers to figure out which of them are power  of two. You do not need to do that, Just use math.pow() method*/
 vector<int> gen_twos(int n) {
     vector<int> twos;
-    int i = 1;
-    while (twos.size() < n) {
-        if (isPowerOfTwo(i)) {
-            twos.push_back(i);
-        }
-        i++;
+    for(int i=0; i<n;++i){
+        int result = static_cast<int>(pow(2, i));
+        twos.push_back(result);
     }
     return twos;
 }
