@@ -55,18 +55,15 @@ bool isPowerOfTwo(int n) {
 /**
  * @brief Generates an n number of power of two numbers and stores them in the vector prime
  * 
- * @param n Number of power of twonumbers generated
+ * @param n Number of power of two numbers generated
  * @return vector<int> twos Vector with all generated power of two numbers
  */
 
 vector<int> gen_twos(int n) {
     vector<int> twos;
-    int i = 1;
-    while (twos.size() < n) {
-        if (isPowerOfTwo(i)) {
-            twos.push_back(i);
-        }
-        i++;
+    for(int i=0; i<n;++i){
+        int result = static_cast<int>(pow(2, i));
+        twos.push_back(result);
     }
     return twos;
 }
